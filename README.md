@@ -1,7 +1,6 @@
-# Cobol
-# 💻 Repositório de Modelos COBOL Mainframe (CICS, DB2 e Batch)
+# 💻 Repositório de Modelos COBOL Mainframe (CICS, IMS, DB2 e Batch)
 
-Este repositório é uma coleção de artefatos de desenvolvimento Mainframe criados para demonstrar o ciclo de vida completo de aplicações z/OS. O objetivo é apresentar exemplos práticos e funcionais de programas COBOL, tanto **Batch** (processamento em lote) quanto **Online** (CICS), interagindo com diferentes tipos de dados (**VSAM** e **DB2**).
+Este repositório é uma coleção de artefatos de desenvolvimento Mainframe criados para demonstrar o ciclo de vida completo de aplicações z/OS. O objetivo é apresentar exemplos práticos e funcionais de programas COBOL, tanto **Batch** (processamento em lote) quanto **Online** (**CICS** e **IMS DC**), interagindo com diferentes tipos de dados (**VSAM**, **DB2** e **IMS DB**).
 
 Além dos códigos-fonte, o repositório inclui os **Mapas de Tela (BMS)** e os **JCLs (Job Control Language)** necessários para compilar, "linkar", "bindar", definir arquivos e executar essas aplicações, mostrando o processo completo desde o desenvolvimento até a implantação.
 
@@ -14,6 +13,9 @@ Além dos códigos-fonte, o repositório inclui os **Mapas de Tela (BMS)** e os 
 | `MYCICSBR.cbl` | CICS Online | **VSAM KSDS** | Navegação (Browse) em arquivo VSAM. |
 | `MYCICSQL.cbl` | CICS Online | **DB2** (SELECT) | Consulta simples em tabela DB2. |
 | `MYCICSBQ.cbl` | CICS Online | **DB2** (Cursores) | Paginação complexa em tabela DB2. |
+| `MYIMSONL.cbl` | IMS DC Online | MPP Básico | Demonstração IMS DC básica (`GU`/`ISRT`). |
+| `MYIMSQL.cbl` | IMS DC Online | IMS DC / **DB2** | Consulta DB2 de um programa IMS. |
+| `MYIMSBWS.cbl` | IMS DC Online | IMS DC / **IMS DB** | Paginação conversacional com **SPA** e `GN`. |
 | `MYDB2BAT.cbl` | Batch | **DB2** (Cursor) | Atualização em lote com `UPDATE ... WHERE CURRENT OF`. |
 | `Misturacor.cbl` | Batch | Lógica Pura | Demonstração de lógica Batch com `ACCEPT`/`DISPLAY`. |
 | **Mapas de Tela** | | | |
@@ -85,4 +87,34 @@ Os programas CICS utilizam a técnica **Pseudo-Conversacional** para manter o es
 
 ---
 
-## 🗺️ Em atualizaçâo, conforme disponibilidade
+## 🛰️ Programas IMS DC (Online)
+
+Os programas IMS DC (Data Communication) são a principal alternativa ao CICS para processamento online. Em vez de comandos `EXEC CICS`, eles usam chamadas `CALL 'CBLTDLI'` (Data Language/Interface) e interagem com **PCBs (Program Communication Blocks)** para se comunicar com o terminal e com bancos de dados.
+
+### 7. MYIMSONL.cbl: Modelo Básico (MPP)
+
+* **Função:** Demonstra a estrutura de um **MPP (Message Processing Program)**, o programa online IMS mais comum, em modo não-conversacional.
+* **Lógica:**
+    * Recebe o **IO-PCB** (o "ponteiro" para o terminal/usuário) na `ENTRY 'DLITCBL'`.
+    * Usa `CALL 'CBLTDLI'` com a função **`GU`** (Get Unique) para ler a mensagem de entrada (o que o usuário digitou) a partir do `IO-PCB`.
+    * Processa a lógica de negócio.
+    * Usa `CALL 'CBLTDLI'` com a função **`ISRT`** (Insert) para enviar a mensagem de resposta de volta ao `IO-PCB` (terminal).
+
+### 8. MYIMSQL.cbl: Consulta Simples (IMS/DB2)
+
+* **Função:** Demonstra um programa híbrido muito comum: um programa online IMS DC que acessa um banco de dados **DB2**.
+* **Lógica:**
+    * Recebe a mensagem de entrada (com o ID do cliente) via **`GU`** no `IO-PCB`.
+    * Usa o ID recebido para executar um `EXEC SQL SELECT ... END-EXEC` padrão no DB2 (esta parte é idêntica ao CICS).
+    * Formata a resposta (seja o nome do cliente ou o `SQLCODE` de erro) em uma área de saída.
+    * Envia a resposta de volta à tela via **`ISRT`** no `IO-PCB`.
+
+### 9. MYIMSBWS.cbl: Paginação Conversacional (SPA)
+
+* **Função:** Implementa a navegação (Browse) em um banco de dados (ex: IMS DB) usando uma **transação conversacional**.
+* **Destaque:** Demonstra os equivalentes IMS para conceitos CICS:
+    * **COMMAREA -> SPA (Scratch Pad Area):** A `ENTRY` do programa recebe o `SPA`, que é usado para salvar o estado da sessão (como a última chave lida) entre as interações do usuário.
+    * **Arquivo (FCT/DD) -> DB-PCB:** O programa recebe um "PCB de Banco de Dados" (`DB-PCB`) que lhe dá acesso ao banco de dados hierárquico IMS DB.
+    * **READNEXT -> 'GN' (Get Next):** O programa usa a chamada `GN` no `DB-PCB` para ler o próximo registro sequencialmente, permitindo a lógica de paginação.
+
+    ⚙️ GIT em atualizaÇão, conforme disponibilidade
