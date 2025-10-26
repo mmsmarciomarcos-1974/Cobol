@@ -70,6 +70,6 @@ Os programas CICS utilizam a técnica **Pseudo-Conversacional** para manter o es
 * [cite_start]**Transação:** Implementa a lógica de `COMMIT` periódico (a cada 1000 registros, definidos em `WS-COMMIT-FREQUENCY`) para evitar *lock* excessivo no DB2 e falhas de transação[cite: 87, 120].
 * [cite_start]**Relatório:** Gera um relatório de resumo com o total de linhas lidas e atualizadas[cite: 127, 129].
 
----
+--
 
-**Próximo Passo:** Gostaria de focar em um desses programas para detalhar um parágrafo de código específico ou entender melhor a implementação de algum comando (e.g., `EXEC CICS STARTBR` ou `EXEC SQL FETCH`)?
+GIT em atualizaÇÃo ....
