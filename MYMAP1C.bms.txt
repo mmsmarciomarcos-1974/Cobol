@@ -1,0 +1,55 @@
+MYSET1   DFHMSD TYPE=&SYSPARM,                                               *
+               LANG=COBOL,                                                 *
+               MODE=INOUT,                                                 *
+               TERM=3270-2,                                                *
+               CTRL=FREEKB,                                                *
+               STORAGE=AUTO,                                               *
+               TIOAPFX=YES
+*
+MYMAP1   DFHMDI SIZE=(24,80),                                                *
+               LINE=1,                                                     *
+               COLUMN=1
+*
+*--- CABECALHO -----------------------------------------------------------
+* Coloca a transacao (TRN1) e o nome do programa (MYCICS) na tela
+         DFHMDF POS=(01,01),LENGTH=4,INITIAL='TRN1'
+         DFHMDF POS=(01,30),LENGTH=20,INITIAL='PROGRAMA CICS SIMPLES'
+         DFHMDF POS=(01,70),LENGTH=08,INITIAL='MYCICS'
+*
+*--- CAMPO DE ENTRADA "DATA" ---------------------------------------------
+*
+* 1. Define um "label" (titulo) para o campo
+         DFHMDF POS=(05,10),LENGTH=15,INITIAL='Digite o Dado:'
+*
+* 2. Define o campo "DATA"
+* Este campo gerara DATAL, DATAF, DATAI, DATAO no copybook.
+* O seu programa usa DATAI (Input) e DATAL (Length), o que esta correto.
+DATA     DFHMDF POS=(05,27),LENGTH=30,                                      *
+               ATTRB=(UNPROT,IC)
+*
+* ATTRB=(UNPROT,IC) significa:
+* UNPROT: Nao protegido (usuario pode digitar)
+* IC:     Insert Cursor (o cursor comecara aqui)
+*
+*--- CAMPO DE MENSAGEM "MSG" ---------------------------------------------
+*
+* 1. Define o campo "MSG"
+* Este campo gerara MSGL, MSGA, MSGI, MSGO no copybook.
+* O seu programa usa MSGO (Output) e MSGOL (Length), o que esta correto.
+MSG      DFHMDF POS=(23,02),LENGTH=70,                                      *
+               ATTRB=(PROT,BRT)
+*
+* ATTRB=(PROT,BRT) significa:
+* PROT: Protegido (usuario nao pode digitar)
+* BRT:  Brilhante (destaca a mensagem)
+*
+*--- RODAPE E CAMPO DUMMY ------------------------------------------------
+*
+* Instrucao para o usuario, baseada na logica do PF3
+         DFHMDF POS=(24,02),LENGTH=19,INITIAL='PF3=SAIR'
+*
+* Campo "dummy" padrao para finalizar o mapa
+         DFHMDF POS=(24,79),LENGTH=1,ATTRB=(PROT,FSET,DRK)
+*
+         DFHMSD TYPE=FINAL
+         END

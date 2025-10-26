@@ -1,0 +1,68 @@
+* MAPSET: MYSET4
+* MAPA:   MYMAP4
+* PROPOSITO: TELA DE BROWSE (PAGINACAO) DE CLIENTES
+*
+MYSET4 DFHMSD TYPE=&SYSPARM,LANG=COBOL,MODE=INOUT,TERM=3270-2, \
+               CTRL=FREEKB,STORAGE=AUTO,TIOAPFX=YES
+*
+* DEFINICAO DO MAPA PRINCIPAL (TELA 24x80)
+*
+MYMAP4 DFHMDI SIZE=(24,80),LINE=1,COLUMN=1,FREEKB=YES
+*
+*----------------------------------------------------------------*
+* CAMPOS ESTATICOS (TITULOS)
+*----------------------------------------------------------------*
+       DFHMDF POS=(01,02),LENGTH=22,ATTRB=(ASKIP,NORM), \
+              INITIAL='CONSULTA DE CLIENTES'
+       DFHMDF POS=(01,70),LENGTH=8,ATTRB=(ASKIP,NORM), \
+              INITIAL='MYCICSBQ'
+       DFHMDF POS=(01,35),LENGTH=10,ATTRB=(ASKIP,NORM), \
+              INITIAL='PAGINA: N/A'
+*
+*----------------------------------------------------------------*
+* CABECALHOS DAS COLUNAS
+*----------------------------------------------------------------*
+       DFHMDF POS=(03,02),LENGTH=10,ATTRB=(ASKIP,BRT), \
+              INITIAL='ID CLIENTE'
+       DFHMDF POS=(03,15),LENGTH=40,ATTRB=(ASKIP,BRT), \
+              INITIAL='NOME DO CLIENTE'
+       DFHMDF POS=(04,02),LENGTH=78,ATTRB=(ASKIP,NORM), \
+              INITIAL='------------------------------------------'
+*
+*----------------------------------------------------------------*
+* GRUPO DE DADOS REPETITIVOS (O CORACAO DA PAGINACAO)
+*
+* 1. DFHMDI aninhado define o 'grupo' que se repete.
+* LINE=5 -> Comeca na linha 5
+* SIZE=(1,78) -> Cada grupo ocupa 1 linha
+* OCCURS=10 -> Repete este grupo 10 vezes (Linhas 5 a 14)
+*
+LINHA  DFHMDI LINE=5,COLUMN=1,SIZE=(1,78),OCCURS=10
+*
+* 2. Campos dentro do grupo.
+* GRPNAME=LINHA -> Associa estes campos ao grupo 'LINHA'.
+* POS=(0,n) -> Posicao RELATIVA ao inicio do grupo (coluna n).
+* ATTRB=PROT -> Protegido (o usuario nao pode digitar aqui).
+*
+IDCLIO DFHMDF POS=(0,02),LENGTH=10,ATTRB=(PROT,NORM),GRPNAME=LINHA
+*
+NOMECLIO DFHMDF POS=(0,15),LENGTH=40,ATTRB=(PROT,NORM),GRPNAME=LINHA
+*
+*----------------------------------------------------------------*
+* AREA DE MENSAGEM E RODAPE
+*----------------------------------------------------------------*
+*
+* Campo da mensagem de saida (MSGO)
+*
+MSGO   DFHMDF POS=(23,02),LENGTH=70,ATTRB=(ASKIP,BRT)
+*
+* Instrucoes do rodape
+*
+       DFHMDF POS=(24,02),LENGTH=36,ATTRB=(ASKIP,NORM), \
+              INITIAL='PF3=Sair   PF7=Voltar   PF8=Avancar'
+*
+*----------------------------------------------------------------*
+* FIM DAS DEFINICOES
+*----------------------------------------------------------------*
+       DFHMSD TYPE=FINAL
+       END

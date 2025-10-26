@@ -1,0 +1,72 @@
+MYSET2   DFHMSD TYPE=&SYSPARM,                                               *
+               LANG=COBOL,                                                 *
+               MODE=INOUT,                                                 *
+               TERM=3270-2,                                                *
+               CTRL=FREEKB,                                                *
+               STORAGE=AUTO,                                               *
+               TIOAPFX=YES
+*
+MYMAP2   DFHMDI SIZE=(24,80),                                                *
+               LINE=1,                                                     *
+               COLUMN=1
+*
+*--- CABECALHO -----------------------------------------------------------
+* O programa referencia a transacao 'TRN2'
+         DFHMDF POS=(01,01),LENGTH=4,INITIAL='TRN2'
+         DFHMDF POS=(01,30),LENGTH=20,INITIAL='CONSULTA DE CLIENTES'
+         DFHMDF POS=(01,70),LENGTH=08,INITIAL='MYCICSBR'
+*
+*--- CABECALHO DAS COLUNAS -----------------------------------------------
+         DFHMDF POS=(03,02),LENGTH=10,INITIAL='ID CLIENTE'
+         DFHMDF POS=(03,15),LENGTH=04,INITIAL='NOME'
+*
+*--- AREA DE DADOS (10 LINHAS) -------------------------------------------
+* Campos: IDCLI (X(10)) e NOMECLI (X(40))
+* A repeticao do mesmo nome (IDCLI, NOMECLI) fara o assembler
+* gerar a clausula 'OCCURS 10' no copybook MYMAP2C.
+*
+*--- LINHA 01
+IDCLI    DFHMDF POS=(05,02),LENGTH=10,ATTRB=PROT
+NOMECLI  DFHMDF POS=(05,15),LENGTH=40,ATTRB=PROT
+*--- LINHA 02
+IDCLI    DFHMDF POS=(06,02),LENGTH=10,ATTRB=PROT
+NOMECLI  DFHMDF POS=(06,15),LENGTH=40,ATTRB=PROT
+*--- LINHA 03
+IDCLI    DFHMDF POS=(07,02),LENGTH=10,ATTRB=PROT
+NOMECLI  DFHMDF POS=(07,15),LENGTH=40,ATTRB=PROT
+*--- LINHA 04
+IDCLI    DFHMDF POS=(08,02),LENGTH=10,ATTRB=PROT
+NOMECLI  DFHMDF POS=(08,15),LENGTH=40,ATTRB=PROT
+*--- LINHA 05
+IDCLI    DFHMDF POS=(09,02),LENGTH=10,ATTRB=PROT
+NOMECLI  DFHMDF POS=(09,15),LENGTH=40,ATTRB=PROT
+*--- LINHA 06
+IDCLI    DFHMDF POS=(10,02),LENGTH=10,ATTRB=PROT
+NOMECLI  DFHMDF POS=(10,15),LENGTH=40,ATTRB=PROT
+*--- LINHA 07
+IDCLI    DFHMDF POS=(11,02),LENGTH=10,ATTRB=PROT
+NOMECLI  DFHMDF POS=(11,15),LENGTH=40,ATTRB=PROT
+*--- LINHA 08
+IDCLI    DFHMDF POS=(12,02),LENGTH=10,ATTRB=PROT
+NOMECLI  DFHMDF POS=(12,15),LENGTH=40,ATTRB=PROT
+*--- LINHA 09
+IDCLI    DFHMDF POS=(13,02),LENGTH=10,ATTRB=PROT
+NOMECLI  DFHMDF POS=(13,15),LENGTH=40,ATTRB=PROT
+*--- LINHA 10
+IDCLI    DFHMDF POS=(14,02),LENGTH=10,ATTRB=PROT
+NOMECLI  DFHMDF POS=(14,15),LENGTH=40,ATTRB=PROT
+*
+*--- RODAPE (MENSAGEM E INSTRUCOES) ---------------------------------------
+*
+* Campo 'MSG' (LENGTH=70) para corresponder a 'MSGO' no COBOL
+MSG      DFHMDF POS=(23,02),LENGTH=70,ATTRB=(PROT,BRT)
+*
+* Instrucoes de PFKEYS (com base na logica do programa)
+         DFHMDF POS=(24,02),LENGTH=40,                                      *
+               INITIAL='PF3=SAI | PF7=RETROCEDE | PF8=AVANCA'
+*
+*--- CAMPO DUMMY (padrao para finalizar o mapa)
+         DFHMDF POS=(24,79),LENGTH=1,ATTRB=(PROT,FSET,DRK)
+*
+         DFHMSD TYPE=FINAL
+         END
