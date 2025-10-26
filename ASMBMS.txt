@@ -1,0 +1,44 @@
+//ASMBMS JOB (ACCT),'ASSEMBLE BMS MAP',CLASS=A,MSGCLASS=X,NOTIFY=&SYSUID
+//*
+//* OBJETIVO: GERAR O MAPA FISICO (LOAD) E O SIMBOLICO (COPY)
+//* A PARTIR DE UM FONTE BMS (MYMAP2C.BMS)
+//*
+//*********************************************************************
+//* PASSO 1: GERAR O MAPA SIMBOLICO (DSECT / COPYBOOK)
+//* RODA O ASSEMBLER DO BMS (DFHMSD) COM SYSPARM=DSECT
+//*********************************************************************
+//COPY     EXEC PGM=DFHMSD,REGION=2M,
+//         PARM='TYPE=DSECT,LANG=COBOL,STORAGE=AUTO'
+//SYSPRINT DD SYSOUT=*
+//*
+//* SYSIN: SEU FONTE BMS
+//SYSIN    DD DSN=SEU.PROJETO.BMSLIB(MYMAP2C),DISP=SHR
+//*
+//* SYSPUNCH: SAIDA DO COPYBOOK GERADO
+//SYSPUNCH DD DSN=SEU.PROJETO.COPYLIB(MYMAP2C),DISP=SHR
+//*
+//*********************************************************************
+//* PASSO 2: GERAR O MAPA FISICO (LOAD MODULE)
+//* RODA O ASSEMBLER (DFHMSD) COM SYSPARM=MAP
+//*********************************************************************
+//MAP      EXEC PGM=DFHMSD,REGION=2M,COND=(0,NE,COPY),
+//         PARM='TYPE=MAP,LANG=COBOL,MODE=INOUT'
+//SYSPRINT DD SYSOUT=*
+//SYSIN    DD DSN=SEU.PROJETO.BMSLIB(MYMAP2C),DISP=SHR
+//SYSLIN   DD DSN=&&MAPOBJ,DISP=(NEW,PASS),
+//         UNIT=SYSDA,SPACE=(TRK,(1,1))
+//*
+//*********************************************************************
+//* PASSO 3: LINK-EDICAO DO MAPA FISICO
+//*********************************************************************
+//LKED     EXEC PGM=IEWL,REGION=2M,COND=(0,NE,MAP)
+//SYSPRINT DD SYSOUT=*
+//SYSUT1   DD UNIT=SYSDA,SPACE=(TRK,(10,1))
+//SYSLIN   DD DSN=&&MAPOBJ,DISP=(OLD,DELETE)
+//*
+//* SYSLMOD: SAIDA PARA A BIBLIOTECA DE LOAD DO CICS
+//* NOTA: O NOME DO MEMBRO DEVE SER O NOME DO MAPSET (MYSET2)
+//SYSLMOD  DD DSN=SUA.CICS.LOADLIB(MYSET2),DISP=SHR
+//SYSIN    DD *
+  NAME MYSET2(R)
+/*
